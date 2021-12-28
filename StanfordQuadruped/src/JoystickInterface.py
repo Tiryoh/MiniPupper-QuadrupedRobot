@@ -37,6 +37,9 @@ class JoystickInterface:
             # Check if requesting a state transition to hopping, from trotting or resting
             hop_toggle = msg["x"]
             command.hop_event = (hop_toggle == 1 and self.previous_hop_toggle == 0)
+            
+            shutdown_toggle = msg["triangle"]
+            command.shutdown_signal = shutdown_toggle
 
             activate_toggle = msg["L1"]
             command.activate_event = (activate_toggle == 1 and self.previous_activate_toggle == 0)

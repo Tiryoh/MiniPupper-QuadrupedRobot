@@ -126,7 +126,9 @@ def main():
     image=Image.open(cartoons_folder + "logo.png")
     image.resize((320,240))
     disp.display(image)
-
+    
+    shutdown_counter = 0            # counter for shuudown cmd
+    
     # Start animated process
     duration = 10
     is_connect = multiprocessing.Value('l', 0)
@@ -206,15 +208,24 @@ def main():
             
             # movement scheme
             movement_switch = command.dance_switch_event
-            gait_state = command.trot_event  
+            gait_state = command.trot_event
+            shutdown_signal = command.shutdown_signal
+            
+            #shutdown counter
+            if shutdown_signal == True:
+                shutdown_counter = shutdown_counter + 1
+                # press shut dow button more 3s(0.015*200), shut down system
+                if shutdown_counter >= 200:             
+                    print('shutdown system now')
+                    os.system('systemctl stop robot')
+                    os.system('shutdown -h now')
 
-            if gait_state == True:                # if triger tort event, reset the movement number to 0
+            # gait and movement control
+            if gait_state == True:       # if triger tort event, reset the movement number to 0
                 movement_ctl.resetMovementNumber()
             movement_ctl.runMovementScheme(movement_switch)
-
             food_location = movement_ctl.getMovemenLegsLocation()
             attitude_location = movement_ctl.getMovemenAttitudeLocation()
-  
             controller.run(state,command,food_location,attitude_location)
 
             # Update the pwm widths going to the servos
